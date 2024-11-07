@@ -8,12 +8,40 @@ export default function Home() {
   const [surgeryType, setSurgeryType] = useState('');
   const [customSurgery, setCustomSurgery] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    // Here you would typically send this to your backend
-    console.log({ email, helpType, surgeryType, customSurgery });
+    setSubmitting(true);
+
+    try {
+      const response = await fetch('https://formspree.io/f/xzzbrvdr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          helpType,
+          surgeryType: surgeryType === 'other' ? customSurgery : surgeryType,
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        // Reset form
+        setEmail('');
+        setHelpType('');
+        setSurgeryType('');
+        setCustomSurgery('');
+      } else {
+        alert('There was an error submitting the form. Please try again.');
+      }
+    } catch (error) {
+      alert('There was an error submitting the form. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -50,6 +78,7 @@ export default function Home() {
                         placeholder="Enter your email address"
                         className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required
+                        name="email"
                       />
                       <select
                         value={helpType}
@@ -60,6 +89,7 @@ export default function Home() {
                         }}
                         className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                         required
+                        name="helpType"
                       >
                         <option value="">How can we help you?</option>
                         <option value="specific-surgery">Information about a specific type of surgery</option>
@@ -76,6 +106,7 @@ export default function Home() {
                           onChange={(e) => setSurgeryType(e.target.value)}
                           className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                           required
+                          name="surgeryType"
                         >
                           <option value="">Select surgery type</option>
                           <option value="spine">Spine Surgery</option>
@@ -97,18 +128,20 @@ export default function Home() {
                           placeholder="Please specify the surgery type"
                           className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           required
+                          name="customSurgery"
                         />
                       )}
 
                       <button 
                         type="submit"
-                        className="group relative w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md transition duration-200 overflow-hidden"
+                        disabled={submitting}
+                        className="group relative w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md transition duration-200 overflow-hidden disabled:opacity-50"
                       >
                         <span className="absolute right-0 top-0 h-full w-12 transform translate-x-12 group-hover:-translate-x-0 transition-transform duration-300 bg-gradient-to-r from-transparent to-blue-500/20">
                           <Send className="h-6 w-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                         </span>
                         <span className="group-hover:pr-8 transition-all duration-300">
-                          Get Personalized Updates
+                          {submitting ? 'Sending...' : 'Get Personalized Updates'}
                         </span>
                       </button>
                     </div>
