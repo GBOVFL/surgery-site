@@ -5,12 +5,12 @@ import { useState } from 'react';
 export default function Home() {
   const [email, setEmail] = useState('');
   const [situation, setSituation] = useState('');
-  const [needs, setNeeds] = useState([]);
+  const [needs, setNeeds] = useState<string[]>([]);
   const [otherNeed, setOtherNeed] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const handleNeedsChange = (need) => {
+  const handleNeedsChange = (need: string) => {
     if (needs.includes(need)) {
       setNeeds(needs.filter(n => n !== need));
     } else {
@@ -18,7 +18,7 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (needs.length === 0) {
       alert('Please select at least one type of help needed');
