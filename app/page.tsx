@@ -1,4 +1,5 @@
 'use client';
+import AboutSection from './AboutSection';
 import { Brain, Clock2, CheckCircle, AlertCircle, Send } from 'lucide-react';
 import { useState } from 'react';
 
@@ -169,6 +170,8 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          <AboutSection />
 
           {/* Features */}
           <div className="grid md:grid-cols-3 gap-8 mb-12">
