@@ -4,7 +4,9 @@ import Image from 'next/image';
 const AboutSection = () => {
   return (
     <div className="bg-white rounded-2xl p-8 shadow-lg mb-12">
-      <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">>Designed by a Neurosurgeon Who Started as a Physical Therapist</h2>
+      <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">
+        Designed by a Neurosurgeon Who Started as a Physical Therapist
+      </h2>
       
       <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* Profile Image */}
