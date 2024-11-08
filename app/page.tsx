@@ -4,28 +4,52 @@ import { useState } from 'react';
 
 export default function Home() {
   const [email, setEmail] = useState('');
+  const [situation, setSituation] = useState('');
+  const [needs, setNeeds] = useState([]);
+  const [otherNeed, setOtherNeed] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  const handleNeedsChange = (need) => {
+    if (needs.includes(need)) {
+      setNeeds(needs.filter(n => n !== need));
+    } else {
+      setNeeds([...needs, need]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (needs.length === 0) {
+      alert('Please select at least one type of help needed');
+      return;
+    }
+    if (needs.includes('other') && !otherNeed.trim()) {
+      alert('Please specify what other help you need');
+      return;
+    }
     setSubmitting(true);
 
     try {
-      const response = await fetch('https://formspree.io/f/xzzbrvdr', {
+      const response = await fetch('https://formspree.io/f/xnnqdyvz', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           email,
-          interest: 'spine surgery assessment'
+          situation,
+          additional_needs: needs,
+          other_need: otherNeed,
         }),
       });
 
       if (response.ok) {
         setSubmitted(true);
         setEmail('');
+        setSituation('');
+        setNeeds([]);
+        setOtherNeed('');
       } else {
         alert('There was an error submitting the form. Please try again.');
       }
@@ -58,10 +82,10 @@ export default function Home() {
                 Complete our clinically-validated assessment to understand if spine surgery might be right for you
               </p>
               
-              {/* Email Signup */}
+              {/* Enhanced Email Signup */}
               <div className="max-w-lg mx-auto mb-4">
                 {!submitted ? (
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="flex flex-col gap-4">
                       <input
                         type="email"
@@ -70,8 +94,56 @@ export default function Home() {
                         placeholder="Enter your email to take the assessment"
                         className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required
-                        name="email"
                       />
+
+                      <select
+                        value={situation}
+                        onChange={(e) => setSituation(e.target.value)}
+                        className="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        required
+                      >
+                        <option value="">What best describes your situation?</option>
+                        <option value="recommended">A doctor recommended spine surgery to me</option>
+                        <option value="considering">I'm wondering if I might need spine surgery</option>
+                        <option value="second_opinion">I want a second opinion about spine surgery</option>
+                        <option value="family_member">I'm helping a family member decide about spine surgery</option>
+                        <option value="other">Other situation</option>
+                      </select>
+
+                      <div className="space-y-2 text-left">
+                        <p className="text-sm font-medium text-blue-900">What help do you need? (Select at least one) *</p>
+                        <div className="space-y-2">
+                          {[
+                            ['find_surgeon', 'Find a qualified spine surgeon'],
+                            ['questions', 'Get questions to ask my surgeon'],
+                            ['second_opinion', 'Get a second opinion'],
+                            ['prep_guide', 'Surgery preparation guide'],
+                            ['recovery', 'Recovery information'],
+                            ['other', 'Other (please specify)']
+                          ].map(([value, label]) => (
+                            <label key={value} className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={needs.includes(value)}
+                                onChange={() => handleNeedsChange(value)}
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              />
+                              <span className="text-blue-800">{label}</span>
+                            </label>
+                          ))}
+                        </div>
+                        
+                        {needs.includes('other') && (
+                          <input
+                            type="text"
+                            value={otherNeed}
+                            onChange={(e) => setOtherNeed(e.target.value)}
+                            placeholder="What other help do you need?"
+                            className="mt-2 w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          />
+                        )}
+                      </div>
 
                       <button 
                         type="submit"
